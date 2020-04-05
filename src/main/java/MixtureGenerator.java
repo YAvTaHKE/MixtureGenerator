@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class MixtureGenerator {
     //База по сырьевым материалам
     private static ArrayList<RawMaterial> rawList = new ArrayList();
-    private static final String bookPath = "C:\\GIT\\JavaRush\\MixtureGentrator\\src\\main\\resources\\RM.xls";
+    private static final String bookPath = "C:\\GIT\\JavaRush\\MixtureGenerator\\src\\main\\resources\\RM.xls";
 
     public static void main(String[] args) {
 
