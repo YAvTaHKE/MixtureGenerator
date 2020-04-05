@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MixtureGentrator.iml" filepath="$PROJECT_DIR$/MixtureGentrator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MixtureGenerator.iml" filepath="$PROJECT_DIR$/MixtureGenerator.iml" />
     </modules>
   </component>
 </project>
