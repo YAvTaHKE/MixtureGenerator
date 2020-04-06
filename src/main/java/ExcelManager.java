@@ -4,22 +4,27 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ExcelManager {
 
     //Excel книга
-    private HSSFWorkbook bookRM;
+    private HSSFWorkbook sourseBookRM;
+    private File destFile;
 
-    public ExcelManager(String bookPath, int headRow){
+    public ExcelManager(String sourceBookPath, String destBookPath){
         try {
-        File bookFile = new File(bookPath);
-        bookRM = (HSSFWorkbook) WorkbookFactory.create(bookFile);
+        File bookFile = new File(sourceBookPath);
+        sourseBookRM = (HSSFWorkbook) WorkbookFactory.create(bookFile);
+        destFile = new File(destBookPath);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (EncryptedDocumentException e) {
@@ -32,7 +37,7 @@ public class ExcelManager {
     //выводит в консоль содержание страницы книги
     public void showFileInConsole(int sheetNum, String format){
 
-        HSSFSheet sheet = bookRM.getSheetAt(sheetNum);
+        HSSFSheet sheet = sourseBookRM.getSheetAt(sheetNum);
         // Автоматическое определение граничных строк обработки (по наличию информации)
         int rowStart = sheet.getFirstRowNum();
         int rowEnd = sheet.getLastRowNum();
@@ -63,7 +68,7 @@ public class ExcelManager {
     public ArrayList<RawMaterial> getRawMaterials (int sheetNum, int headRow){
         ArrayList<RawMaterial> rawMaterials = new ArrayList<>();
 
-        HSSFSheet sheet = bookRM.getSheetAt(sheetNum);
+        HSSFSheet sheet = sourseBookRM.getSheetAt(sheetNum);
         // Устанавливаем границы данных
         int rowStart = sheet.getFirstRowNum() + headRow;
         int rowEnd = sheet.getLastRowNum();
@@ -104,4 +109,47 @@ public class ExcelManager {
         }
         return rawMaterial;
     }
+
+    //Записать Excel файл
+    public void createXLS (ArrayList<RawMaterial> rmList, int rowNum, int cellNum){
+        // создание самого excel файла в памяти
+        HSSFWorkbook destBook = new HSSFWorkbook();
+        // создание листа с названием
+        HSSFSheet sheet = destBook.createSheet();
+
+        // заполняем лист данными
+        for (RawMaterial rm : rmList) {
+            //создание строки
+            createSheetRow(sheet, rowNum++, cellNum, rm);
+        }
+
+        // записываем созданный в памяти Excel документ в файл
+        createFile(destBook, destFile);
+        System.out.println("Excel файл успешно создан!");
+    }
+    //заполнить строку данными
+    private void createSheetRow(HSSFSheet sheet, int rowNum, int cellNum, RawMaterial rm){
+
+        //ссылка на строку
+        Row row = sheet.createRow(rowNum);
+
+        row.createCell(cellNum++).setCellValue(rm.getName());
+        row.createCell(cellNum++).setCellValue(rm.getPrice());
+        row.createCell(cellNum++).setCellValue(rm.getBD());
+
+        Map<Oxide, Double> map = rm.getChemicalAnalysis();
+        for (Oxide ox : Oxide.values()) {
+            row.createCell(cellNum++).setCellValue(map.get(ox));
+        }
+    }
+
+    //записать книгу в файл
+    private void createFile(HSSFWorkbook hssfWorkbook, File destFile){
+        try (FileOutputStream out = new FileOutputStream(destFile)) {
+            hssfWorkbook.write(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
