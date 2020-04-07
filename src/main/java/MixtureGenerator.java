@@ -1,4 +1,7 @@
 
+import GUI.MainFrame;
+
+import java.awt.*;
 import java.util.ArrayList;
 
 public class MixtureGenerator {
@@ -8,7 +11,7 @@ public class MixtureGenerator {
     private static final String destBookPath = "C:\\GIT\\JavaRush\\MixtureGenerator\\src\\main\\resources\\destRM.xls";
 
     public static void main(String[] args) {
-
+/*
         ExcelManager excelManager = new ExcelManager(sourceBookPath, destBookPath);
         //Вывести данные в консоль
         excelManager.showFileInConsole(0, "|%-19s|");
@@ -18,6 +21,8 @@ public class MixtureGenerator {
         rawList.forEach(rm -> System.out.println(rm));
         //записать новый Excel файл с данными
         excelManager.createXLS(rawList, 4, 2);
+        */
+        EventQueue.invokeLater(() -> new MainFrame().setVisible(true));
 
     }
 }
