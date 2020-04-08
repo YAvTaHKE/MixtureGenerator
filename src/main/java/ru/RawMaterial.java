@@ -1,9 +1,9 @@
+package ru;
 
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.ss.usermodel.DataFormatter;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class RawMaterial {
@@ -64,11 +64,6 @@ public class RawMaterial {
 
     @Override
     public String toString() {
-        return "RawMaterial{" +
-                "name='" + name + '\'' +
-                ", price=" + price +
-                ", bd=" + bd +
-                ", chemicalAnalysis=" + chemicalAnalysis +
-                '}';
+        return name;
     }
 }

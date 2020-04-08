@@ -1,3 +1,4 @@
+package ru;
 
 public enum Oxide {
     MgO,

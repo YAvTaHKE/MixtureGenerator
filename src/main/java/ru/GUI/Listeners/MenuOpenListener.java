@@ -1,6 +1,4 @@
-package GUI.Listeners;
-
-import GUI.MainFrame;
+package ru.GUI.Listeners;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

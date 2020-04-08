@@ -1,16 +1,22 @@
-package GUI;
+package ru.GUI;
 
 import javax.swing.*;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
-import GUI.Listeners.MenuOpenListener;
-import GUI.Listeners.MenuNewMixtureListener;
+import ru.GUI.Listeners.MenuOpenListener;
+import ru.GUI.Listeners.MenuNewMixtureListener;
 
 public class MainFrame extends JFrame {
 
     JMenuItem itemOpen;
     JMenuItem itemNewMixture;
+    JMenuItem itemClose;
 
     public MainFrame(){
         super("Mixture generator");
@@ -40,7 +46,8 @@ public class MainFrame extends JFrame {
             menuFile.add(itemOpen);
             itemNewMixture = new JMenuItem("New mixture");
             menuFile.add(itemNewMixture);
-            JMenuItem itemClose = new JMenuItem("Close");
+            menuFile.addSeparator();
+            itemClose = new JMenuItem("Close");
             menuFile.add(itemClose);
 
         JMenu menuHelp = new JMenu("HELP");
@@ -66,6 +73,13 @@ public class MainFrame extends JFrame {
                 int res = JOptionPane.showConfirmDialog(MainFrame.this, "Выйти из программы?");
                 if (res == JOptionPane.YES_OPTION)
                     System.exit(0);
+            }
+        });
+
+        itemClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
             }
         });
     }
