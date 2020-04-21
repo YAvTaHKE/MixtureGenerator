@@ -1,5 +1,7 @@
 package ru.GUI;
 
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
+import org.w3c.dom.ls.LSOutput;
 import ru.MixtureGenerator;
 import ru.Oxide;
 import ru.RawMaterial;
@@ -9,6 +11,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import java.awt.*;
+import java.sql.SQLOutput;
 import java.util.Map;
 
 public class NewMixtureFrame extends JFrame {
@@ -31,7 +34,7 @@ public class NewMixtureFrame extends JFrame {
         this.setDefaultCloseOperation((WindowConstants.DISPOSE_ON_CLOSE));
         this.setResizable(true);
         this.setLocationRelativeTo(null); //окно в центре экрана
-        setSize(800, 300);
+        setSize(830, 330);
 
         initDefaultData();
         initTable();
@@ -43,8 +46,7 @@ public class NewMixtureFrame extends JFrame {
             int j = 0;
             defaultData[i][j++] = rm;
             defaultData[i][j++] = rm.getPrice();
-            Double proportion = new Double(0);
-            defaultData[i][j++] = proportion;
+            defaultData[i][j++] = String.valueOf(0); //proportion
         }
     }
     //Инициализация таблицы
@@ -95,9 +97,19 @@ public class NewMixtureFrame extends JFrame {
                 {
                     @Override
                     public void tableChanged(TableModelEvent e) {
-                        System.out.println(e.getType());
-                        if (e.getColumn() == 0) {
-                            updateDataRow(e.getFirstRow());
+                        System.out.println("Тип события - " + e.getType() + " Column - " + e.getColumn() + " Row - " + e.getFirstRow());
+                        switch (e.getColumn()) {
+                            case 0:
+                                updateDataRow(e.getFirstRow());
+                                break;
+                            case 2:
+                                try {
+                                    Double.valueOf((String) model.getValueAt(e.getFirstRow(), e.getColumn()));
+                                } catch (NumberFormatException exc) {
+                                    JOptionPane.showMessageDialog(NewMixtureFrame.this, "Не правильный формат данных. Введите числовое значение.");
+                                }
+                                updateDataRow(e.getFirstRow());
+                                break;
                         }
                     }
                 });
@@ -128,8 +140,9 @@ public class NewMixtureFrame extends JFrame {
         TableModel model = table.getModel();
             int j = 1;
             model.setValueAt(rm.getPrice(), row, j++);
-            Double proportion = (Double) model.getValueAt(row, j++);
-            Double mass = 900*proportion/100;
+            String pr = (String) model.getValueAt(row, j++);
+            Double proportion = Double.valueOf(pr);
+            Double mass = 1000*proportion/100;
             model.setValueAt(mass, row, j++);
             model.setValueAt(mass/rm.getBD(), row, j++);
             model.setValueAt(rm.getBD(), row, j++);
