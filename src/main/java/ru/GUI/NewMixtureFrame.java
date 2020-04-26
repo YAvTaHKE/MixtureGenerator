@@ -1,5 +1,6 @@
 package ru.GUI;
 
+import ru.GUI.Utilities.HtmlStyler;
 import ru.MixtureGenerator;
 import ru.Oxide;
 import ru.RawMaterial;
@@ -21,10 +22,26 @@ public class NewMixtureFrame extends JFrame {
     private JScrollPane scrollPane_2;
     private JTable table_1;
     private JTable table_2;
+    private JButton button;
 
     // Название столбцов
-    private String[] columnsNanme = { "Raw materials", "Price, RMB", "Proportion, %", "Weight, kg", "Volume, %", "BD, г/ см\u00B3", "MgO", "Al\u2082O\u2083", "SiO\u2082", "CaO", "Fe\u2082O\u2083", "TiO\u2082", "C", "LOI"};
-    private final int DEFAULT_COLUMS_COUNT = columnsNanme.length;
+    private String[] columnsName = {
+            "Сырье",
+            "Доля от массы, %",
+            "<html>Цена BK5, RMB</html>",
+            "Цена BK6, RMB",
+            "Доля от объема, %",
+            "Объем, м3",
+            "Масса, кг",
+            "Плотность, кг/м\u00B3",
+            "MgO", "Al\u2082O\u2083",
+            "SiO\u2082",
+            "CaO",
+            "Fe\u2082O\u2083",
+            "TiO\u2082",
+            "C",
+            "LOI"};
+    private final int DEFAULT_COLUMS_COUNT = columnsName.length;
     private final int DEFAULT_ROW_COUNT = 11;
     // Данные для таблицы по умолчанию
     private Object[][] defaultTableData = new Object[DEFAULT_ROW_COUNT][DEFAULT_COLUMS_COUNT];
@@ -54,16 +71,23 @@ public class NewMixtureFrame extends JFrame {
         contentPane.add(scrollPane_2);
 
         initDefaultData(); //Создание данный для таблицы по умолчанию
+        columnsName = htmlFormatter(columnsName); //Форматирование наименований колонок
 
-        table_1 = new JTable(new DefaultTableModel(defaultTableData, columnsNanme)); //Основная таблица
+        table_1 = new JTable(new DefaultTableModel(defaultTableData, columnsName)); //Основная таблица
         initTableView(table_1); //настройка стиля таблицы
         setComboEditor(0); //установка раскрывающегостя списка в 0 колонку
         addModelListener(table_1); //установка слушателя событий
         scrollPane_1.setViewportView(table_1); //добавление таблицы в scrollPane
 
-        table_2 = new JTable(new DefaultTableModel(defaultTableData, columnsNanme));
+        table_2 = new JTable(new DefaultTableModel(defaultTableData, columnsName));
         initTableView(table_2);
         scrollPane_2.setViewportView(table_2); //добавление таблицы в scrollPane
+
+        String name = "Button\nButton";
+        button = new JButton("<html>" + name.replaceAll("\\n", "<br>") + "</html>");
+        //button.setSize(50, 100);
+        button.setBounds(5, 230, 100, 50);
+        contentPane.add(button);
     }
 
     //Инициализация таблицы по умолчанию
@@ -75,6 +99,19 @@ public class NewMixtureFrame extends JFrame {
             defaultTableData[i][j++] = rm.getPrice();
             defaultTableData[i][j++] = String.valueOf(0); //proportion
         }
+    }
+
+    //Установить стиль наименования колонок в HTML формате
+    private String[] htmlFormatter(String[] strings){
+        String[] str = new String[strings.length];
+
+        for (int i = 0; i < strings.length; i++) {
+            HtmlStyler style = new HtmlStyler(strings[i]);
+            style.center();
+            style.bold();
+            str[i] = style.getHtmlString();
+        }
+        return str;
     }
 
     //Инициализация таблицы
@@ -92,15 +129,18 @@ public class NewMixtureFrame extends JFrame {
             }
         });
 
+
         // Автоматическая установка ширины столбцов
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         JTableHeader th = table.getTableHeader();
+        System.out.println(th.getDefaultRenderer());
+
         for (int i = 0; i < table.getColumnCount(); i++) {
             TableColumn column = table.getColumnModel().getColumn(i);
             int prefWidth =
                     Math.round(
                             (float) th.getFontMetrics(
-                                    th.getFont()).getStringBounds(th.getTable().getColumnName(i),
+                                    th.getFont()).getStringBounds(th.getTable().getColumnName(i).replaceAll("\\<.*?\\>", ""),
                                     th.getGraphics()
                             ).getWidth()
                     );
@@ -109,8 +149,12 @@ public class NewMixtureFrame extends JFrame {
                 column.setPreferredWidth(prefWidth + 10);
             else column.setPreferredWidth(50);
         }
+
+
         //Заполнять форму таблицей
         table.setFillsViewportHeight(true);
+        //Увеличить высоту строки заголовка
+        //table.getTableHeader().setPreferredSize(new Dimension(0, 60));
     }
 
     private void setComboEditor(int columnNum){
