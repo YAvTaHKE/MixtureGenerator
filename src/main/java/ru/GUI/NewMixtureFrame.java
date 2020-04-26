@@ -1,69 +1,84 @@
 package ru.GUI;
 
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
-import org.w3c.dom.ls.LSOutput;
 import ru.MixtureGenerator;
 import ru.Oxide;
 import ru.RawMaterial;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import java.awt.*;
-import java.sql.SQLOutput;
 import java.util.Map;
 
 public class NewMixtureFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
+
+    private JPanel contentPane;
+    private JScrollPane scrollPane_1;
+    private JScrollPane scrollPane_2;
+    private JTable table_1;
+    private JTable table_2;
+
     // Название столбцов
-    private String[] columns = { "Raw materials", "Price, RMB", "Proportion, %", "Weight, kg", "Volume, %", "BD, г/ см\u00B3", "MgO", "Al\u2082O\u2083", "SiO\u2082", "CaO", "Fe\u2082O\u2083", "TiO\u2082", "C", "LOI"};
-    private final int DEFAULT_COLUMS_COUNT = columns.length;
+    private String[] columnsNanme = { "Raw materials", "Price, RMB", "Proportion, %", "Weight, kg", "Volume, %", "BD, г/ см\u00B3", "MgO", "Al\u2082O\u2083", "SiO\u2082", "CaO", "Fe\u2082O\u2083", "TiO\u2082", "C", "LOI"};
+    private final int DEFAULT_COLUMS_COUNT = columnsNanme.length;
     private final int DEFAULT_ROW_COUNT = 11;
-
-
     // Данные для таблицы по умолчанию
-    private Object[][] defaultData = new Object[DEFAULT_ROW_COUNT][DEFAULT_COLUMS_COUNT];
-
-    JTable table;
-
+    private Object[][] defaultTableData = new Object[DEFAULT_ROW_COUNT][DEFAULT_COLUMS_COUNT];
 
     public NewMixtureFrame() throws HeadlessException {
-        super("New mixture");
+
+        //настройки фрейма
+        this.setTitle("New mixture");
         this.setDefaultCloseOperation((WindowConstants.DISPOSE_ON_CLOSE));
         this.setResizable(true);
+        this.setSize(829, 800); //размеры фрейма
         this.setLocationRelativeTo(null); //окно в центре экрана
-        setSize(830, 330);
 
-        initDefaultData();
-        initTable();
+        //контейнер верхнего уровня
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        this.setContentPane(contentPane);
+        contentPane.setLayout(null);//абсолютное позиционирование по координатам внутри контейнера
+
+        //легковесный контейнер
+        scrollPane_1 = new JScrollPane();
+        scrollPane_1.setBounds(5, 5, 800, 220);
+        contentPane.add(scrollPane_1);
+
+        scrollPane_2 = new JScrollPane();
+        scrollPane_2.setBounds(5, 300, 800, 220);
+        contentPane.add(scrollPane_2);
+
+        initDefaultData(); //Создание данный для таблицы по умолчанию
+
+        table_1 = new JTable(new DefaultTableModel(defaultTableData, columnsNanme)); //Основная таблица
+        initTableView(table_1); //настройка стиля таблицы
+        setComboEditor(0); //установка раскрывающегостя списка в 0 колонку
+        addModelListener(table_1); //установка слушателя событий
+        scrollPane_1.setViewportView(table_1); //добавление таблицы в scrollPane
+
+        table_2 = new JTable(new DefaultTableModel(defaultTableData, columnsNanme));
+        initTableView(table_2);
+        scrollPane_2.setViewportView(table_2); //добавление таблицы в scrollPane
     }
+
     //Инициализация таблицы по умолчанию
     private void initDefaultData(){
         for (int i = 0; i < DEFAULT_ROW_COUNT; i++){
             RawMaterial rm = MixtureGenerator.rawList.get(i);
             int j = 0;
-            defaultData[i][j++] = rm;
-            defaultData[i][j++] = rm.getPrice();
-            defaultData[i][j++] = String.valueOf(0); //proportion
+            defaultTableData[i][j++] = rm;
+            defaultTableData[i][j++] = rm.getPrice();
+            defaultTableData[i][j++] = String.valueOf(0); //proportion
         }
     }
+
     //Инициализация таблицы
-    private void initTable(){
-
-        // Создание модели таблицы
-        DefaultTableModel model = new DefaultTableModel(defaultData, columns) {
-            private static final long serialVersionUID = 1L;
-
-            // Функция получения типа столбца
-            /*public Class<?> getColumnClass(int column) {
-                return defaultData[0][column].getClass();
-            }*/
-
-        };
-        // Создание таблицы
-        table = new JTable(model);
+    private void initTableView(JTable table){
 
         //Выровнить наименования колонок "по цетру"
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
@@ -77,46 +92,7 @@ public class NewMixtureFrame extends JFrame {
             }
         });
 
-        // Установка ширины столбцов
-        setColumnsWidth(table);
-        // Раскрывающийся список из объектов RawMaterials
-
-        JComboBox<RawMaterial> combo = new JComboBox<RawMaterial>(MixtureGenerator.rawList.toArray(new RawMaterial[MixtureGenerator.rawList.size()]));
-
-        // Редактор ячейки с раскрывающимся списком
-        DefaultCellEditor editor = new DefaultCellEditor(combo);
-        // Определение редактора ячеек для первой колонки
-        table.getColumnModel().getColumn(0).setCellEditor(editor);
-        //Заполнять форму таблицей
-        //table.setFillsViewportHeight(false);
-        // Вывод окна на экран
-        getContentPane().add(new JScrollPane(table));
-
-        table.getModel().addTableModelListener(
-                new TableModelListener()
-                {
-                    @Override
-                    public void tableChanged(TableModelEvent e) {
-                        System.out.println("Тип события - " + e.getType() + " Column - " + e.getColumn() + " Row - " + e.getFirstRow());
-                        switch (e.getColumn()) {
-                            case 0:
-                                updateDataRow(e.getFirstRow());
-                                break;
-                            case 2:
-                                try {
-                                    Double.valueOf((String) model.getValueAt(e.getFirstRow(), e.getColumn()));
-                                } catch (NumberFormatException exc) {
-                                    JOptionPane.showMessageDialog(NewMixtureFrame.this, "Не правильный формат данных. Введите числовое значение.");
-                                }
-                                updateDataRow(e.getFirstRow());
-                                break;
-                        }
-                    }
-                });
-    }
-
-    //Автоматическая настройка ширины столбцов по содержимому
-    public final static void setColumnsWidth(JTable table) {
+        // Автоматическая установка ширины столбцов
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         JTableHeader th = table.getTableHeader();
         for (int i = 0; i < table.getColumnCount(); i++) {
@@ -130,14 +106,50 @@ public class NewMixtureFrame extends JFrame {
                     );
 
             if (prefWidth > 40)
-            column.setPreferredWidth(prefWidth + 10);
+                column.setPreferredWidth(prefWidth + 10);
             else column.setPreferredWidth(50);
         }
+        //Заполнять форму таблицей
+        table.setFillsViewportHeight(true);
     }
 
+    private void setComboEditor(int columnNum){
+
+        JComboBox<RawMaterial> combo = new JComboBox<RawMaterial>(MixtureGenerator.rawList.toArray(new RawMaterial[MixtureGenerator.rawList.size()]));
+        // Редактор ячейки с раскрывающимся списком
+        DefaultCellEditor editor = new DefaultCellEditor(combo);
+        // Определение редактора ячеек для первой колонки
+        table_1.getColumnModel().getColumn(columnNum).setCellEditor(editor);
+    }
+
+    private void addModelListener(JTable table) {
+        table.getModel().addTableModelListener(
+                new TableModelListener()
+                {
+                    @Override
+                    public void tableChanged(TableModelEvent e) {
+                        System.out.println("Тип события - " + e.getType() + " Column - " + e.getColumn() + " Row - " + e.getFirstRow());
+                        switch (e.getColumn()) {
+                            case 0:
+                                updateDataRow(e.getFirstRow());
+                                break;
+                            case 2:
+                                try {
+                                    Double.valueOf((String) table.getModel().getValueAt(e.getFirstRow(), e.getColumn()));
+                                } catch (NumberFormatException exc) {
+                                    JOptionPane.showMessageDialog(NewMixtureFrame.this, "Не правильный формат данных. Введите числовое значение.");
+                                }
+                                updateDataRow(e.getFirstRow());
+                                break;
+                        }
+                    }
+                });
+    }
+
+    //Обновление данных в таблице
     public void updateDataRow(int row) {
-        RawMaterial rm = (RawMaterial) table.getModel().getValueAt(row, 0);
-        TableModel model = table.getModel();
+        RawMaterial rm = (RawMaterial) table_1.getModel().getValueAt(row, 0);
+        TableModel model = table_1.getModel();
             int j = 1;
             model.setValueAt(rm.getPrice(), row, j++);
             String pr = (String) model.getValueAt(row, j++);
