@@ -8,6 +8,6 @@ import java.awt.event.ActionListener;
 public class MenuNewMixtureListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-        new NewMixtureFrame().setVisible(true);
+        new NewMixtureFrame();
     }
 }
