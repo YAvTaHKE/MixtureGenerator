@@ -1,6 +1,5 @@
 package ru.GUI;
-
-import ru.GUI.Utilities.HtmlStyler;
+;
 import ru.MixtureGenerator;
 import ru.Oxide;
 import ru.RawMaterial;
@@ -32,25 +31,23 @@ public class NewMixtureFrame extends JFrame {
 
         initDefaultData(); //Создание данный для таблицы по умолчанию
 
-        table_1 = new JTable(); //Основная таблица
-        initTableView(table_1);
-        table_1.setModel(new TableModel_1(tableData));
+        table_1 = new JTable();
+        initTableView(table_1, new TableModel_1(tableData));
         setComboEditor(table_1,0); //установка раскрывающегостя списка в 0 колонку
 
-        table_2 = new JTable(); //Основная таблица
-        initTableView(table_2);
-        table_2.setModel(new TableModel_2(tableData));
+        table_2 = new JTable();
+        initTableView(table_2, new TableModel_2(tableData));
 
         //контейнер верхнего уровня
         contentPane = new JPanel(new GridLayout(2, 1));
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         this.setContentPane(contentPane);
 
-        JScrollPane scrollPane_1 = new JScrollPane(table_1);
+        scrollPane_1 = new JScrollPane(table_1);
         scrollPane_1.setBorder(new EmptyBorder(5,5,5,5));
         contentPane.add(makeTitledPanel("Расчет шихты", scrollPane_1));
 
-        JScrollPane scrollPane_2 = new JScrollPane(table_2);
+        scrollPane_2 = new JScrollPane(table_2);
         scrollPane_2.setBorder(new EmptyBorder(5,5,5,5));
         contentPane.add(makeTitledPanel("Данные по сырью", scrollPane_2));
 
@@ -79,9 +76,8 @@ public class NewMixtureFrame extends JFrame {
     }
 
 
-    //Инициализация таблицы
-    private void initTableView(JTable table){
-
+    //Инициализация таблицы, важна последовательность
+    private void initTableView(JTable table, TableModel tableModel){
         //Установить вид заголовка
         DefaultTableColumnModel tableColumnModel = new DefaultTableColumnModel() {
             public void addColumn(TableColumn column) {
@@ -90,26 +86,25 @@ public class NewMixtureFrame extends JFrame {
                 super.addColumn(column);
             }
         };
-        table.setColumnModel(tableColumnModel);
 
+        table.setColumnModel(tableColumnModel);
+        table.setModel(tableModel);
 
         //Выровнить наименования колонок "по цетру"
         //((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
 
         //Выровнить данные в таблице "по центру"
-       /* table.setDefaultRenderer(table.getColumnClass(1), new DefaultTableCellRenderer(){
+        table.setDefaultRenderer(table.getColumnClass(1), new DefaultTableCellRenderer(){
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.setHorizontalAlignment(SwingConstants.CENTER);
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 return this;
             }
-        });*/
-
+        });
 
         // Автоматическая установка ширины столбцов
-        /*table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         JTableHeader th = table.getTableHeader();
-
         for (int i = 0; i < table.getColumnCount(); i++) {
             TableColumn column = table.getColumnModel().getColumn(i);
             int prefWidth =
@@ -123,10 +118,10 @@ public class NewMixtureFrame extends JFrame {
             if (prefWidth > 40)
                 column.setPreferredWidth(prefWidth + 10);
             else column.setPreferredWidth(50);
-        }*/
-
+        }
         //Заполнять форму таблицей
         //table.setFillsViewportHeight(true);
+
     }
 
     private void setComboEditor(JTable table, int columnNum){

@@ -26,12 +26,12 @@ public class MainFrame extends JFrame {
         this.setResizable(false);
         this.setLocationRelativeTo(null); //окно в центре экрана
         //Устанавливаем зависимость внешнего вида окна от платформы
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName ());
-        }
-        catch (Exception e) {
+        /*try {
+
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
         buildMenuBar();
         setListeners();
