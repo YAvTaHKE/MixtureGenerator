@@ -1,6 +1,7 @@
-package GUI;
+package ru.GUI;
 
 import javax.swing.*;
+
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,9 +9,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
+import ru.GUI.Listeners.MenuOpenListener;
+import ru.GUI.Listeners.MenuNewMixtureListener;
+
 public class MainFrame extends JFrame {
 
-    private JMenuItem itemOpen;
+    JMenuItem itemOpen;
+    JMenuItem itemNewMixture;
+    JMenuItem itemClose;
 
     public MainFrame(){
         super("Mixture generator");
@@ -20,12 +26,12 @@ public class MainFrame extends JFrame {
         this.setResizable(false);
         this.setLocationRelativeTo(null); //окно в центре экрана
         //Устанавливаем зависимость внешнего вида окна от платформы
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName ());
-        }
-        catch (Exception e) {
+        /*try {
+
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
         buildMenuBar();
         setListeners();
@@ -38,9 +44,10 @@ public class MainFrame extends JFrame {
         menuBar.add(menuFile);
             itemOpen = new JMenuItem(("Open"));
             menuFile.add(itemOpen);
-            JMenuItem itemNewMixture = new JMenuItem("New mixture");
+            itemNewMixture = new JMenuItem("New mixture");
             menuFile.add(itemNewMixture);
-            JMenuItem itemClose = new JMenuItem("Close");
+            menuFile.addSeparator();
+            itemClose = new JMenuItem("Close");
             menuFile.add(itemClose);
 
         JMenu menuHelp = new JMenu("HELP");
@@ -53,24 +60,10 @@ public class MainFrame extends JFrame {
 
     private void setListeners(){
         // Вывод окна выбора файла при нажатии MainFrame/MenuBar/MenuFile/Open
+        itemOpen.addActionListener(new MenuOpenListener());
 
-        itemOpen.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Выбор файла");
-                //Установка фильтра на выбор файлов
-                fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("XLS File", "xls"));
-                //Убирает из фильтра *AllFiles
-                fileChooser.setAcceptAllFileFilterUsed(false);
-                int result = fileChooser.showOpenDialog(MainFrame.this);
-                // Если директория выбрана, покажем ее в сообщении
-                if (result == JFileChooser.APPROVE_OPTION ){
-                    File file = fileChooser.getSelectedFile();
-                    JOptionPane.showMessageDialog(MainFrame.this, fileChooser.getSelectedFile());
-                }
-            }
-        });
+        //меню MainFrame/MenuBar/MenuFile/New mixture
+        itemNewMixture.addActionListener(new MenuNewMixtureListener());
 
         // Подтверждение закрытия окна при нажатии на "крестик"
         this.addWindowListener (new WindowAdapter() {
@@ -82,6 +75,12 @@ public class MainFrame extends JFrame {
                     System.exit(0);
             }
         });
-    }
 
+        itemClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+    }
 }
