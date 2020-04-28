@@ -97,18 +97,25 @@ public class ExcelManager {
         rawMaterial.setName(formatter.formatCellValue(row.getCell(minCol++)));
 
         try {
-            rawMaterial.setPrice(Integer.parseInt(formatter.formatCellValue(row.getCell(minCol++))));
+            rawMaterial.setPriceBK5(Integer.parseInt(formatter.formatCellValue(row.getCell(minCol++))));
         } catch (NumberFormatException e) {
-            rawMaterial.setPrice(0);
+            rawMaterial.setPriceBK5(0);
+        }
+        try {
+            rawMaterial.setPriceBK6(Integer.parseInt(formatter.formatCellValue(row.getCell(minCol++))));
+        } catch (NumberFormatException e) {
+            rawMaterial.setPriceBK6(0);
         }
 
-        rawMaterial.setChemicalAnalysis(row, minCol++);
-
         try {
-            rawMaterial.setBD(Double.valueOf(formatter.formatCellValue(row.getCell(minCol))));
+            rawMaterial.setBD(Double.valueOf(formatter.formatCellValue(row.getCell(minCol++))));
         } catch (NumberFormatException e) {
             rawMaterial.setBD(0d);
         }
+
+        rawMaterial.setChemicalAnalysis(row, minCol);
+
+
         return rawMaterial;
     }
 
@@ -136,7 +143,8 @@ public class ExcelManager {
         Row row = sheet.createRow(rowNum);
 
         row.createCell(cellNum++).setCellValue(rm.getName());
-        row.createCell(cellNum++).setCellValue(rm.getPrice());
+        row.createCell(cellNum++).setCellValue(rm.getPriceBK5());
+        row.createCell(cellNum++).setCellValue(rm.getPriceBK6());
         row.createCell(cellNum++).setCellValue(rm.getBD());
 
         Map<Oxide, Double> map = rm.getChemicalAnalysis();

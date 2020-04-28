@@ -160,7 +160,7 @@ public class NewMixtureFrame extends JFrame {
         RawMaterial rm = (RawMaterial) table_1.getModel().getValueAt(row, 0);
         TableModel model = table_1.getModel();
             int j = 1;
-            model.setValueAt(rm.getPrice(), row, j++);
+            model.setValueAt(rm.getPriceBK5(), row, j++);
             String pr = (String) model.getValueAt(row, j++);
             Double proportion = Double.valueOf(pr);
             Double mass = 1000*proportion/100;
