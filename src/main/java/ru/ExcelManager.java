@@ -97,18 +97,18 @@ public class ExcelManager {
         rawMaterial.setName(formatter.formatCellValue(row.getCell(minCol++)));
 
         try {
-            rawMaterial.setPriceBK5(Integer.parseInt(formatter.formatCellValue(row.getCell(minCol++))));
+            rawMaterial.setPriceBK5(Double.valueOf((formatter.formatCellValue(row.getCell(minCol++))).replace(",", ".")));
         } catch (NumberFormatException e) {
             rawMaterial.setPriceBK5(0);
         }
         try {
-            rawMaterial.setPriceBK6(Integer.parseInt(formatter.formatCellValue(row.getCell(minCol++))));
+            rawMaterial.setPriceBK6(Double.valueOf((formatter.formatCellValue(row.getCell(minCol++))).replace(",", ".")));
         } catch (NumberFormatException e) {
             rawMaterial.setPriceBK6(0);
         }
 
         try {
-            rawMaterial.setBD(Double.valueOf(formatter.formatCellValue(row.getCell(minCol++))));
+            rawMaterial.setBD(Double.valueOf((formatter.formatCellValue(row.getCell(minCol++))).replace(",", ".")));
         } catch (NumberFormatException e) {
             rawMaterial.setBD(0d);
         }

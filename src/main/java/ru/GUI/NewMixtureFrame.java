@@ -6,6 +6,7 @@ import ru.RawMaterial;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
@@ -23,20 +24,14 @@ public class NewMixtureFrame extends JFrame {
     private JTable table_1;
     private JTable table_2;
 
-    private final int DEFAULT_ROW_COUNT = 11;
-    // Данные для таблицы по умолчанию
-    private ArrayList<RawMaterial> tableData;
-
     public NewMixtureFrame() throws HeadlessException {
 
-        initDefaultData(); //Создание данный для таблицы по умолчанию
-
         table_1 = new JTable();
-        initTableView(table_1, new TableModel_1(tableData));
+        initTableView(table_1, new TableModel_1(MixtureGenerator.rawList));
         setComboEditor(table_1,0); //установка раскрывающегостя списка в 0 колонку
 
         table_2 = new JTable();
-        initTableView(table_2, new TableModel_2(tableData));
+        initTableView(table_2, new TableModel_2(MixtureGenerator.rawList));
 
         //контейнер верхнего уровня
         contentPane = new JPanel(new GridLayout(2, 1));
@@ -52,29 +47,16 @@ public class NewMixtureFrame extends JFrame {
         contentPane.add(makeTitledPanel("Данные по сырью", scrollPane_2));
 
 
-        //addModelListener(table_1); //установка слушателя событий
+        addModelListener(table_1); //установка слушателя событий
 
         //настройки фрейма
         this.setTitle("New mixture");
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setLocationByPlatform(true);
-        this.setSize(829, 600); //размеры фрейма
+        this.setSize(925, 600); //размеры фрейма
         this.setLocationRelativeTo(null); //окно в центре экрана
         this.setVisible(true);
     }
-
-    //Инициализация таблицы по умолчанию
-    private void initDefaultData(){
-        tableData = new ArrayList<>();
-
-        for (int i = 0; i < DEFAULT_ROW_COUNT; i++){
-            if (i >= MixtureGenerator.rawList.size()) {
-                break;
-            }
-            tableData.add(MixtureGenerator.rawList.get(i));
-        }
-    }
-
 
     //Инициализация таблицы, важна последовательность
     private void initTableView(JTable table, TableModel tableModel){
@@ -83,6 +65,7 @@ public class NewMixtureFrame extends JFrame {
             public void addColumn(TableColumn column) {
                 //This works, but is a bit kludgey as it creates an unused JTableHeader object for each column:
                 column.setHeaderRenderer(new JTableHeader().getDefaultRenderer());
+
                 super.addColumn(column);
             }
         };
@@ -94,7 +77,7 @@ public class NewMixtureFrame extends JFrame {
         //((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
 
         //Выровнить данные в таблице "по центру"
-        table.setDefaultRenderer(table.getColumnClass(1), new DefaultTableCellRenderer(){
+        table.setDefaultRenderer(Double.class, new DefaultTableCellRenderer(){
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.setHorizontalAlignment(SwingConstants.CENTER);
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -103,7 +86,7 @@ public class NewMixtureFrame extends JFrame {
         });
 
         // Автоматическая установка ширины столбцов
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        /*table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         JTableHeader th = table.getTableHeader();
         for (int i = 0; i < table.getColumnCount(); i++) {
             TableColumn column = table.getColumnModel().getColumn(i);
@@ -118,11 +101,40 @@ public class NewMixtureFrame extends JFrame {
             if (prefWidth > 40)
                 column.setPreferredWidth(prefWidth + 10);
             else column.setPreferredWidth(50);
+        }*/
+
+        //Ручная установка ширины колонки
+        //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            int colWidth;
+            switch (i) {
+                case 0: {colWidth = 80; break;}
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:{colWidth = 60; break;}
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15: {colWidth = 40; break;}
+                default: {colWidth = 40;}
+            }
+            TableColumn column = table.getColumnModel().getColumn(i);
+            column.setPreferredWidth(colWidth);
         }
+
         //Заполнять форму таблицей
         //table.setFillsViewportHeight(true);
 
     }
+
 
     private void setComboEditor(JTable table, int columnNum){
 
@@ -130,6 +142,7 @@ public class NewMixtureFrame extends JFrame {
         // Определение редактора ячеек для первой колонки
         table.getColumnModel().getColumn(columnNum).setCellEditor(new DefaultCellEditor(combo));
     }
+
 
     private void addModelListener(JTable table) {
         table.getModel().addTableModelListener(
@@ -139,17 +152,16 @@ public class NewMixtureFrame extends JFrame {
                     public void tableChanged(TableModelEvent e) {
                         System.out.println("Тип события - " + e.getType() + " Column - " + e.getColumn() + " Row - " + e.getFirstRow());
                         switch (e.getColumn()) {
-                            case 0:
+                            case 0: {
+                                RawMaterial rm = (RawMaterial) table.getModel().getValueAt(e.getFirstRow(), 0);
+                                System.out.println(rm.getBD());
                                 updateDataRow(e.getFirstRow());
                                 break;
-                            case 2:
-                                try {
-                                    Double.valueOf((String) table.getModel().getValueAt(e.getFirstRow(), e.getColumn()));
-                                } catch (NumberFormatException exc) {
-                                    JOptionPane.showMessageDialog(NewMixtureFrame.this, "Не правильный формат данных. Введите числовое значение.");
-                                }
+                            }
+                            case 1: {
                                 updateDataRow(e.getFirstRow());
                                 break;
+                            }
                         }
                     }
                 });
@@ -159,21 +171,26 @@ public class NewMixtureFrame extends JFrame {
     public void updateDataRow(int row) {
         RawMaterial rm = (RawMaterial) table_1.getModel().getValueAt(row, 0);
         TableModel model = table_1.getModel();
-            int j = 1;
-            model.setValueAt(rm.getPriceBK5(), row, j++);
-            String pr = (String) model.getValueAt(row, j++);
-            Double proportion = Double.valueOf(pr);
-            Double mass = 1000*proportion/100;
-            model.setValueAt(mass, row, j++);
-            model.setValueAt(mass/rm.getBD(), row, j++);
-            model.setValueAt(rm.getBD(), row, j++);
 
-            Map<Oxide, Double> map = rm.getChemicalAnalysis();
+        Double proportion = (Double) model.getValueAt(row, 1);
+        double mass = 1000*proportion/100;
+        Double volume = mass / rm.getBD();
 
-            for (Oxide oxide : Oxide.values()) {
-                model.setValueAt(map.get(oxide)*proportion/100, row, j++);
-            }
+        model.setValueAt(rm.getPriceBK5(), row, 2); //Цена BK5, RMB
+        model.setValueAt(rm.getPriceBK6(), row, 3); //Цена BK6, RMB
+        model.setValueAt(0.0D, row, 4); //Доля от объема, %
+        model.setValueAt(volume, row, 5); //Объем, м3
+        model.setValueAt(mass, row, 6); //Масса, кг
+        model.setValueAt(rm.getBD(), row, 7); //BD
+        int j = 8;
+        //Химия
+        Map<Oxide, Double> map = rm.getChemicalAnalysis();
+
+        for (Oxide oxide : Oxide.values()) {
+            model.setValueAt(map.get(oxide)*proportion/100, row, j++);
+        }
     }
+
 
     private static JComponent makeTitledPanel(String title, JComponent c) {
         JPanel p = new JPanel(new BorderLayout());
