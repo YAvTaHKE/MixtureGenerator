@@ -53,6 +53,7 @@ public class TableModel_1 extends AbstractTableModel {
     }
 
     private void initDefaultData(ArrayList<RawMaterial> rmList){
+        Double sumProportion = new Double(0.0D);
         for(int i = 0; i < DEFAULT_ROW_COUNT; ++i) {
             Object[] rowObj = new Object[this.getColumnCount()];
             RawMaterial rm = rmList.get(i);
@@ -60,28 +61,32 @@ public class TableModel_1 extends AbstractTableModel {
             Double proportion = new Double(0.0D);
             Double mass = 1000.0D * proportion / 100.0D;
             Double volume = mass / rm.getBD();
-            int var14 = j + 1;
+            int var = j + 1;
             rowObj[j] = rm;
-            rowObj[var14++] = proportion;
-            rowObj[var14++] = rm.getPriceBK5();
-            rowObj[var14++] = rm.getPriceBK6();
-            rowObj[var14++] = new Double(0.0D);
-            rowObj[var14++] = volume;
-            rowObj[var14++] = mass;
-            rowObj[var14++] = rm.getBD();
+            rowObj[var++] = proportion;
+            rowObj[var++] = rm.getPriceBK5();
+            rowObj[var++] = rm.getPriceBK6();
+            rowObj[var++] = new Double(0.0D);
+            rowObj[var++] = volume;
+            rowObj[var++] = mass;
+            rowObj[var++] = rm.getBD();
             Map<Oxide, Double> map = rm.getChemicalAnalysis();
             Oxide[] var10 = Oxide.values();
             int var11 = var10.length;
 
             for(int var12 = 0; var12 < var11; ++var12) {
                 Oxide oxide = var10[var12];
-                rowObj[var14++] = map.get(oxide) * proportion / 100.0D;
+                rowObj[var++] = map.get(oxide) * proportion / 100.0D;
             }
-
-
-
             this.data.add(rowObj);
+
+            //суммарная строка
+            sumProportion += proportion;
         }
+        //пустая строка
+        Object[] sumObj = new Object[this.getColumnCount()];
+        sumObj[1] = sumProportion;
+        data.add(sumObj);
     }
 
 
@@ -109,6 +114,7 @@ public class TableModel_1 extends AbstractTableModel {
     public boolean isCellEditable(int row, int col) {
         //Note that the data/cell address is constant,
         //no matter where the cell appears onscreen.
+        if (row == 11) return false;
         if (col > 1) {
             return false;
         } else {

@@ -79,11 +79,39 @@ public class NewMixtureFrame extends JFrame {
         //Выровнить данные в таблице "по центру"
         table.setDefaultRenderer(Double.class, new DefaultTableCellRenderer(){
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+                //установка отображения основной части таблицы
                 super.setHorizontalAlignment(SwingConstants.CENTER);
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                super.setOpaque(true);
+                super.setBackground(Color.ORANGE);
+
+                //Установка отображения строки суммирования результатов
+                if (row == 11) {
+                    JLabel c = new JLabel(value != null ? value.toString() : "");
+                    c.setOpaque(true);
+                    c.setBackground(Color.YELLOW);
+                    c.setHorizontalAlignment(SwingConstants.CENTER);
+                    if (column == 1) {
+                        try {
+                            Double sumProportion = (Double) value;
+                            if (sumProportion > 101.8D || sumProportion < 100) {
+                                c.setForeground(Color.RED);
+                            } else {
+                                c.setForeground(Color.BLACK);
+                            }
+                            c.setHorizontalAlignment(SwingConstants.CENTER);
+                            return c;
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return c;
+                }
                 return this;
             }
         });
+
 
         // Автоматическая установка ширины столбцов
         /*table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -151,15 +179,18 @@ public class NewMixtureFrame extends JFrame {
                     @Override
                     public void tableChanged(TableModelEvent e) {
                         System.out.println("Тип события - " + e.getType() + " Column - " + e.getColumn() + " Row - " + e.getFirstRow());
+                        if (e.getFirstRow() == 11) return;
                         switch (e.getColumn()) {
                             case 0: {
                                 RawMaterial rm = (RawMaterial) table.getModel().getValueAt(e.getFirstRow(), 0);
                                 System.out.println(rm.getBD());
                                 updateDataRow(e.getFirstRow());
+                                updateSummary();
                                 break;
                             }
                             case 1: {
                                 updateDataRow(e.getFirstRow());
+                                updateSummary();
                                 break;
                             }
                         }
@@ -189,6 +220,17 @@ public class NewMixtureFrame extends JFrame {
         for (Oxide oxide : Oxide.values()) {
             model.setValueAt(map.get(oxide)*proportion/100, row, j++);
         }
+    }
+
+    public void updateSummary(){
+        TableModel model = table_1.getModel();
+        Double sumProportion = 0.0D;
+        for (int i = 0; i < table_1.getRowCount() - 1; i++) {
+
+            sumProportion += (Double) model.getValueAt(i, 1);
+        }
+        model.setValueAt(sumProportion, table_1.getRowCount()-1, 1);
+
     }
 
 
