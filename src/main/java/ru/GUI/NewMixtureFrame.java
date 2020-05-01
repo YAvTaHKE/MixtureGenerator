@@ -46,7 +46,6 @@ public class NewMixtureFrame extends JFrame {
         scrollPane_2.setBorder(new EmptyBorder(5,5,5,5));
         contentPane.add(makeTitledPanel("Данные по сырью", scrollPane_2));
 
-
         addModelListener(table_1); //установка слушателя событий
 
         //настройки фрейма
@@ -63,9 +62,7 @@ public class NewMixtureFrame extends JFrame {
         //Установить вид заголовка
         DefaultTableColumnModel tableColumnModel = new DefaultTableColumnModel() {
             public void addColumn(TableColumn column) {
-                //This works, but is a bit kludgey as it creates an unused JTableHeader object for each column:
                 column.setHeaderRenderer(new JTableHeader().getDefaultRenderer());
-
                 super.addColumn(column);
             }
         };
@@ -73,63 +70,8 @@ public class NewMixtureFrame extends JFrame {
         table.setColumnModel(tableColumnModel);
         table.setModel(tableModel);
 
-        //Выровнить наименования колонок "по цетру"
-        //((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-
-        //Выровнить данные в таблице "по центру"
-        table.setDefaultRenderer(Double.class, new DefaultTableCellRenderer(){
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-
-                //установка отображения основной части таблицы
-                super.setHorizontalAlignment(SwingConstants.CENTER);
-                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                super.setOpaque(true);
-                super.setBackground(Color.ORANGE);
-
-                //Установка отображения строки суммирования результатов
-                if (row == 11) {
-                    JLabel c = new JLabel(value != null ? value.toString() : "");
-                    c.setOpaque(true);
-                    c.setBackground(Color.YELLOW);
-                    c.setHorizontalAlignment(SwingConstants.CENTER);
-                    if (column == 1) {
-                        try {
-                            Double sumProportion = (Double) value;
-                            if (sumProportion > 101.8D || sumProportion < 100) {
-                                c.setForeground(Color.RED);
-                            } else {
-                                c.setForeground(Color.BLACK);
-                            }
-                            c.setHorizontalAlignment(SwingConstants.CENTER);
-                            return c;
-                        } catch (NullPointerException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    return c;
-                }
-                return this;
-            }
-        });
-
-
-        // Автоматическая установка ширины столбцов
-        /*table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        JTableHeader th = table.getTableHeader();
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            TableColumn column = table.getColumnModel().getColumn(i);
-            int prefWidth =
-                    Math.round(
-                            (float) th.getFontMetrics(
-                                    th.getFont()).getStringBounds(th.getTable().getColumnName(i).replaceAll("\\<.*?\\>", ""),
-                                    th.getGraphics()
-                            ).getWidth()
-                    );
-
-            if (prefWidth > 40)
-                column.setPreferredWidth(prefWidth + 10);
-            else column.setPreferredWidth(50);
-        }*/
+        //Установить свой рендер на отображение ячеек
+        table.setDefaultRenderer(Double.class, new CustomCellRenderer(1));
 
         //Ручная установка ширины колонки
         //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -160,13 +102,14 @@ public class NewMixtureFrame extends JFrame {
 
         //Заполнять форму таблицей
         //table.setFillsViewportHeight(true);
-
     }
 
 
     private void setComboEditor(JTable table, int columnNum){
 
+        MixtureGenerator.rawList.add(new RawMaterial());
         JComboBox<RawMaterial> combo = new JComboBox<RawMaterial>(MixtureGenerator.rawList.toArray(new RawMaterial[MixtureGenerator.rawList.size()]));
+
         // Определение редактора ячеек для первой колонки
         table.getColumnModel().getColumn(columnNum).setCellEditor(new DefaultCellEditor(combo));
     }
@@ -178,17 +121,28 @@ public class NewMixtureFrame extends JFrame {
                 {
                     @Override
                     public void tableChanged(TableModelEvent e) {
-                        System.out.println("Тип события - " + e.getType() + " Column - " + e.getColumn() + " Row - " + e.getFirstRow());
+                        //System.out.println("Тип события - " + e.getType() + " Column - " + e.getColumn() + " Row - " + e.getFirstRow());
                         if (e.getFirstRow() == 11) return;
                         switch (e.getColumn()) {
                             case 0: {
                                 RawMaterial rm = (RawMaterial) table.getModel().getValueAt(e.getFirstRow(), 0);
-                                System.out.println(rm.getBD());
+                                if (rm.getName().equals("-")) {
+                                    table.getModel().setValueAt(0.0D, e.getFirstRow(), 1);//установить пропорцию = 0;
+                                }
+                                System.out.println(rm.getName() + rm.getBD() + rm.getClass());
+                                updateDataRow(e.getFirstRow());
+                                updateSummary();
+
+                                //обновить зависимости
                                 updateDataRow(e.getFirstRow());
                                 updateSummary();
                                 break;
                             }
                             case 1: {
+                                updateDataRow(e.getFirstRow());
+                                updateSummary();
+
+                                //обновить зависимости
                                 updateDataRow(e.getFirstRow());
                                 updateSummary();
                                 break;
@@ -205,11 +159,11 @@ public class NewMixtureFrame extends JFrame {
 
         Double proportion = (Double) model.getValueAt(row, 1);
         double mass = 1000*proportion/100;
-        Double volume = mass / rm.getBD();
+        Double volume = mass / rm.getBD() / 1000;
 
         model.setValueAt(rm.getPriceBK5(), row, 2); //Цена BK5, RMB
         model.setValueAt(rm.getPriceBK6(), row, 3); //Цена BK6, RMB
-        model.setValueAt(0.0D, row, 4); //Доля от объема, %
+        model.setValueAt((Double) model.getValueAt(row, 5) * 100 /(Double) model.getValueAt(11, 5), row, 4); //Доля от объема, %
         model.setValueAt(volume, row, 5); //Объем, м3
         model.setValueAt(mass, row, 6); //Масса, кг
         model.setValueAt(rm.getBD(), row, 7); //BD

@@ -54,13 +54,14 @@ public class TableModel_1 extends AbstractTableModel {
 
     private void initDefaultData(ArrayList<RawMaterial> rmList){
         Double sumProportion = new Double(0.0D);
+        Double sumVolume = new Double(0.0D);
         for(int i = 0; i < DEFAULT_ROW_COUNT; ++i) {
             Object[] rowObj = new Object[this.getColumnCount()];
             RawMaterial rm = rmList.get(i);
             int j = 0;
-            Double proportion = new Double(0.0D);
+            Double proportion = new Double(9.0D);
             Double mass = 1000.0D * proportion / 100.0D;
-            Double volume = mass / rm.getBD();
+            Double volume = mass / rm.getBD()/1000;
             int var = j + 1;
             rowObj[j] = rm;
             rowObj[var++] = proportion;
@@ -82,11 +83,18 @@ public class TableModel_1 extends AbstractTableModel {
 
             //суммарная строка
             sumProportion += proportion;
+            sumVolume += volume;
         }
         //пустая строка
         Object[] sumObj = new Object[this.getColumnCount()];
         sumObj[1] = sumProportion;
+        sumObj[5] = sumVolume;
         data.add(sumObj);
+        
+        //Отрисовка доли объема
+        for (int i = 0; i < DEFAULT_ROW_COUNT; i++) {
+            setValueAt((Double)data.get(i)[5] * 100/sumVolume, i , 4);
+        }
     }
 
 
@@ -115,11 +123,10 @@ public class TableModel_1 extends AbstractTableModel {
         //Note that the data/cell address is constant,
         //no matter where the cell appears onscreen.
         if (row == 11) return false;
-        if (col > 1) {
-            return false;
-        } else {
-            return true;
-        }
+        if (col > 1) return false;
+        Object obj = getValueAt(row, 0);
+        if (obj != null && obj.toString().equals("-") && col == 1) return false;
+        return true;
     }
 
     /*
@@ -127,7 +134,7 @@ public class TableModel_1 extends AbstractTableModel {
      * data can change.
      */
    public void setValueAt(Object value, int row, int col) {
-        data.get(row)[col] = value;
+           data.get(row)[col] = value;
         fireTableCellUpdated(row, col);
    }
 }

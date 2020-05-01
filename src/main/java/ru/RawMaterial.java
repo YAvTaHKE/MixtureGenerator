@@ -36,11 +36,14 @@ public class RawMaterial {
     }
 
     public RawMaterial() {
-        this.name = "default";
-        this.priceBK5 =0;
-        this.priceBK6 =0;
+        this.name = "-";
+        this.priceBK5 =0.0D;
+        this.priceBK6 =0.0D;
         this.chemicalAnalysis = new HashMap<>();
-        this.bd = 0;
+        for (Oxide oxide : Oxide.values()) {
+            chemicalAnalysis.put(oxide, 0.0D);
+        }
+        this.bd = 0.0D;
     }
 
     public String getName() {
