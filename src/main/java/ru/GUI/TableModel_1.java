@@ -38,7 +38,7 @@ public class TableModel_1 extends AbstractTableModel {
     public TableModel_1(ArrayList<RawMaterial> rmList) {
         columnNames = htmlFormatter(columnNames);
         this.data = new ArrayList<>();
-        initDefaultData(rmList);
+        initDefaultData(defaultRawList(rmList));
     }
     private String[] htmlFormatter(String[] strings){
         String[] str = new String[strings.length];
@@ -50,6 +50,74 @@ public class TableModel_1 extends AbstractTableModel {
             str[i] = style.getHtmlString();
         }
         return str;
+    }
+
+    private ArrayList<RawMaterial> defaultRawList(ArrayList<RawMaterial> rmList) {
+        ArrayList<RawMaterial> list = new ArrayList<>();
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").trim().toUpperCase().equals("FM968LC")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").trim().toUpperCase().equals("FM968")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").trim().toUpperCase().equals("SCRAPMC")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("AL97")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("SI97")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("SIC95")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("G195")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("PITCH")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        rmList.forEach(rawMaterial -> {
+            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("RESIN")) {
+                list.add(rawMaterial);
+            }
+        });
+
+        int k = list.size();
+        if (k != DEFAULT_ROW_COUNT){
+            for (int i = 0; i < DEFAULT_ROW_COUNT - k; i++) {
+                list.add(new RawMaterial());
+            }
+        }
+
+
+        return list;
     }
 
     private void initDefaultData(ArrayList<RawMaterial> rmList){
