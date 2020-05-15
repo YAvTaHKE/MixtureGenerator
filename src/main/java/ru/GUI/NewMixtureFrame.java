@@ -31,6 +31,7 @@ public class NewMixtureFrame extends JFrame {
         table_1 = new JTable();
         initTableView(table_1, new TableModel_1(MixtureGenerator.rawList));
         setComboEditor(table_1,0); //установка раскрывающегостя списка в 0 колонку
+        updateSummary();
 
         table_2 = new JTable();
         initTableView(table_2, new TableModel_2(MixtureGenerator.rawList));
@@ -126,8 +127,11 @@ public class NewMixtureFrame extends JFrame {
 
     private void setComboEditor(JTable table, int columnNum){
 
-        MixtureGenerator.rawList.add(new RawMaterial());
-        JComboBox<RawMaterial> combo = new JComboBox<RawMaterial>(MixtureGenerator.rawList.toArray(new RawMaterial[MixtureGenerator.rawList.size()]));
+        ArrayList<RawMaterial> list = new ArrayList<>();
+        MixtureGenerator.rawList.forEach((k, v) -> list.add(v));
+        list.add(new RawMaterial());
+
+        JComboBox<RawMaterial> combo = new JComboBox<RawMaterial>(list.toArray(new RawMaterial[MixtureGenerator.rawList.size()]));
 
         // Определение редактора ячеек для первой колонки
         table.getColumnModel().getColumn(columnNum).setCellEditor(new DefaultCellEditor(combo));
@@ -148,7 +152,6 @@ public class NewMixtureFrame extends JFrame {
                                 if (rm.getName().equals("-")) {
                                     table.getModel().setValueAt(0.0D, e.getFirstRow(), 1);//установить пропорцию = 0;
                                 }
-                                System.out.println(rm.getName() + rm.getBD() + rm.getClass());
                                 updateDataRow(e.getFirstRow());
                                 updateSummary();
 
@@ -178,11 +181,15 @@ public class NewMixtureFrame extends JFrame {
 
         Double proportion = (Double) model.getValueAt(row, 1);
         double mass = 1000*proportion/100;
-        Double volume = mass / rm.getBD() / 1000;
+        Double BD = rm.getBD();
+        Double volume = 0.0D;
+        if (BD != 0) {
+            volume = mass / rm.getBD();
+        }
 
         model.setValueAt(rm.getPriceBK5(), row, 2); //Цена BK5, RMB
         model.setValueAt(rm.getPriceBK6(), row, 3); //Цена BK6, RMB
-        model.setValueAt((Double) model.getValueAt(row, 5) * 100 /(Double) model.getValueAt(11, 5), row, 4); //Доля от объема, %
+        model.setValueAt(volume * 100 /(Double) model.getValueAt(11, 5), row, 4); //Доля от объема, %
         model.setValueAt(volume, row, 5); //Объем, м3
         model.setValueAt(mass, row, 6); //Масса, кг
         model.setValueAt(rm.getBD(), row, 7); //BD
@@ -198,12 +205,45 @@ public class NewMixtureFrame extends JFrame {
     public void updateSummary(){
         TableModel model = table_1.getModel();
         Double sumProportion = 0.0D;
+        Double sumVolume = 0.0D;
+        Double sumMass = 0.0D;
+        Double sumMg = 0.0D;
+        Double sumAl = 0.0D;
+        Double sumSi = 0.0D;
+        Double sumCa = 0.0D;
+        Double sumFe = 0.0D;
+        Double sumTi = 0.0D;
+        Double sumC = 0.0D;
+        Double sumLOI = 0.0D;
+
         for (int i = 0; i < table_1.getRowCount() - 1; i++) {
 
             sumProportion += (Double) model.getValueAt(i, 1);
+            Double vol = (Double) model.getValueAt(i, 5);
+            sumVolume = sumVolume + vol;
+            sumMass += (Double) model.getValueAt(i, 6);
+            sumMg += (Double) model.getValueAt(i, 8);
+            sumAl += (Double) model.getValueAt(i, 9);
+            sumSi += (Double) model.getValueAt(i, 10);
+            sumCa += (Double) model.getValueAt(i, 11);
+            sumFe += (Double) model.getValueAt(i, 12);
+            sumTi += (Double) model.getValueAt(i, 13);
+            sumC += (Double) model.getValueAt(i, 14);
+            sumLOI += (Double) model.getValueAt(i, 15);
         }
-        model.setValueAt(sumProportion, table_1.getRowCount()-1, 1);
 
+        model.setValueAt(sumProportion, table_1.getRowCount()-1, 1);
+        model.setValueAt(sumVolume, table_1.getRowCount()-1, 5);
+        model.setValueAt(sumMass, table_1.getRowCount()-1, 6);
+        model.setValueAt(sumMass/sumVolume*0.98, table_1.getRowCount()-1, 7);
+        model.setValueAt(sumMg, table_1.getRowCount()-1, 8);
+        model.setValueAt(sumAl, table_1.getRowCount()-1, 9);
+        model.setValueAt(sumSi, table_1.getRowCount()-1, 10);
+        model.setValueAt(sumCa, table_1.getRowCount()-1, 11);
+        model.setValueAt(sumFe, table_1.getRowCount()-1, 12);
+        model.setValueAt(sumTi, table_1.getRowCount()-1, 13);
+        model.setValueAt(sumC, table_1.getRowCount()-1, 14);
+        model.setValueAt(sumLOI, table_1.getRowCount()-1, 15);
     }
 
 
@@ -213,4 +253,5 @@ public class NewMixtureFrame extends JFrame {
         p.setBorder(BorderFactory.createTitledBorder(title));
         return p;
     }
+
 }

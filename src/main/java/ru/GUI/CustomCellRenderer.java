@@ -1,7 +1,5 @@
 package ru.GUI;
 
-import ru.RawMaterial;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
@@ -23,12 +21,26 @@ public class CustomCellRenderer extends DefaultTableCellRenderer {
         //super.setOpaque(true);
         //super.setBackground(Color.ORANGE);
 
-
-        if (column == 1 && row != 11) {
-            JLabel c = new JLabel(String.format(Locale.GERMANY, "%.1f %%", value));
+        if (column == 7 ) {
+            Object obj = table.getValueAt(row, 0);
+            if (obj != null) {
+                if (obj.toString().equals("-")) {
+                    JLabel c = new JLabel("-");
+                    c.setHorizontalAlignment(SwingConstants.CENTER);
+                    return c;
+                }
+            }
+            JLabel c = new JLabel(String.format(Locale.GERMANY, "%.2f", value));
+            if(row == 11){
+                c.setOpaque(true);
+                //c.setFont(new Font(c.getFont().getName(),Font.BOLD, 12));
+            } else {
+                c.setFont(new Font(c.getFont().getName(),Font.PLAIN, 12));
+            }
             c.setHorizontalAlignment(SwingConstants.CENTER);
             return c;
         }
+
 
         //Отображать прочерк, если не задан сырьевой компонент
         Object obj = table.getValueAt(row, 0);
@@ -38,6 +50,11 @@ public class CustomCellRenderer extends DefaultTableCellRenderer {
                 c.setHorizontalAlignment(SwingConstants.CENTER);
                 return c;
             }
+        }
+        if (column == 1 && row != 11) {
+            JLabel c = new JLabel(String.format(Locale.GERMANY, "%.1f %%", value));
+            c.setHorizontalAlignment(SwingConstants.CENTER);
+            return c;
         }
 
 

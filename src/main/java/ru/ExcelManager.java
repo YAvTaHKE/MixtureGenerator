@@ -14,6 +14,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ExcelManager {
@@ -67,8 +69,8 @@ public class ExcelManager {
     }
 
     //Возвращает совокупность объектов сырьевых материалов на странице книги
-    public ArrayList<RawMaterial> getRawMaterials (int sheetNum, int headRow){
-        ArrayList<RawMaterial> rawMaterials = new ArrayList<>();
+    public HashMap<String, RawMaterial> getRawMaterials (int sheetNum, int headRow){
+        HashMap<String, RawMaterial> rawMaterials = new LinkedHashMap<>();
 
         HSSFSheet sheet = sourseBookRM.getSheetAt(sheetNum);
         // Устанавливаем границы данных
@@ -76,12 +78,16 @@ public class ExcelManager {
         int rowEnd = sheet.getLastRowNum();
 
         //перебираем все ячейки установленной области
-        for (int rw = rowStart; rw < rowEnd; rw++) {
+        for (int rw = rowStart; rw <= rowEnd; rw++) {
             HSSFRow row = sheet.getRow(rw);
             if (row == null) {
                 continue;
             }
-            rawMaterials.add(newRM(row));
+            RawMaterial rm = newRM(row);
+            String formatName = rm.getName();
+            //Убрать все знаки пунктуации и сделать все буквы заглавными
+            formatName = formatName.replaceAll("[\\pP\\s]", "").toUpperCase();
+            rawMaterials.put(formatName, rm);
         }
         return rawMaterials;
     }
@@ -93,8 +99,8 @@ public class ExcelManager {
         short minCol = row.getFirstCellNum();
 
         RawMaterial rawMaterial = new RawMaterial();
-
-        rawMaterial.setName(formatter.formatCellValue(row.getCell(minCol++)));
+        String name = formatter.formatCellValue(row.getCell(minCol++));
+        rawMaterial.setName(name);
 
         try {
             rawMaterial.setPriceBK5(Double.valueOf((formatter.formatCellValue(row.getCell(minCol++))).replace(",", ".")));

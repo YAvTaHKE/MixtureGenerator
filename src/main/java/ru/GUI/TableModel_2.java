@@ -5,10 +5,12 @@ import ru.RawMaterial;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 
 
-    public class TableModel_2 extends AbstractTableModel {
-        private boolean DEBUG = false;
+public class TableModel_2 extends AbstractTableModel {
 
         private String[] columnNames = {
                 "Сырье",
@@ -26,11 +28,12 @@ import java.util.ArrayList;
                 "TiO\u2082",
                 "C",
                 "LOI"};
-        private ArrayList<RawMaterial> data;
+        private ArrayList<RawMaterial> data = new ArrayList<>();
 
-        public TableModel_2(ArrayList<RawMaterial> data) {
+        public TableModel_2(HashMap<String, RawMaterial> data) {
+
+            data.forEach((k, v) -> this.data.add(v));
             columnNames = htmlFormatter(columnNames);
-            this.data = data;
         }
         private String[] htmlFormatter(String[] strings){
             String[] str = new String[strings.length];

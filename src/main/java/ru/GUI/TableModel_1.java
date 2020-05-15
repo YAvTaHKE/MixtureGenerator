@@ -1,5 +1,6 @@
 package ru.GUI;
 
+import ru.GUI.Utilities.DefaultMixtures;
 import ru.GUI.Utilities.HtmlStyler;
 import ru.MixtureGenerator;
 import ru.Oxide;
@@ -9,6 +10,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TableModel_1 extends AbstractTableModel {
@@ -21,9 +24,9 @@ public class TableModel_1 extends AbstractTableModel {
             "Цена BK5, RMB",
             "Цена BK6, RMB",
             "Доля от объема, %",
-            "Объем, м3",
+            "Объем, дм3",
             "Масса, кг",
-            "BD, кг/м\u00B3",
+            "BD, г/см\u00B3",
             "MgO",
             "Al\u2082O\u2083",
             "SiO\u2082",
@@ -35,10 +38,10 @@ public class TableModel_1 extends AbstractTableModel {
 
     private ArrayList<Object[]> data;
 
-    public TableModel_1(ArrayList<RawMaterial> rmList) {
+    public TableModel_1(HashMap<String, RawMaterial> rmList) {
         columnNames = htmlFormatter(columnNames);
         this.data = new ArrayList<>();
-        initDefaultData(defaultRawList(rmList));
+        initDefaultData(DefaultMixtures.MC(rmList));
     }
     private String[] htmlFormatter(String[] strings){
         String[] str = new String[strings.length];
@@ -52,117 +55,41 @@ public class TableModel_1 extends AbstractTableModel {
         return str;
     }
 
-    private ArrayList<RawMaterial> defaultRawList(ArrayList<RawMaterial> rmList) {
-        ArrayList<RawMaterial> list = new ArrayList<>();
 
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").trim().toUpperCase().equals("FM968LC")) {
-                list.add(rawMaterial);
-            }
-        });
+    private void initDefaultData(LinkedHashMap<RawMaterial, Double> rmMap){
 
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").trim().toUpperCase().equals("FM968")) {
-                list.add(rawMaterial);
-            }
-        });
+            rmMap.forEach((rm, proportion) -> {
+                Object[] rowObj = new Object[this.getColumnCount()];
+                int j = 0;
+                Double mass = 1000.0D * proportion / 100.0D;
+                Double BD = rm.getBD();
+                Double volume = 0D;
+                if (BD != 0) {
+                    volume = mass / BD;
+                }
+                int var = j + 1;
+                rowObj[j] = rm;
+                rowObj[var++] = proportion;
+                rowObj[var++] = rm.getPriceBK5();
+                rowObj[var++] = rm.getPriceBK6();
+                rowObj[var++] = new Double(0.0D);
+                rowObj[var++] = volume;
+                rowObj[var++] = mass;
+                rowObj[var++] = rm.getBD();
+                Map<Oxide, Double> map = rm.getChemicalAnalysis();
+                Oxide[] var10 = Oxide.values();
+                int var11 = var10.length;
 
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").trim().toUpperCase().equals("SCRAPMC")) {
-                list.add(rawMaterial);
-            }
-        });
-
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("AL97")) {
-                list.add(rawMaterial);
-            }
-        });
-
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("SI97")) {
-                list.add(rawMaterial);
-            }
-        });
-
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("SIC95")) {
-                list.add(rawMaterial);
-            }
-        });
-
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("G195")) {
-                list.add(rawMaterial);
-            }
-        });
-
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("PITCH")) {
-                list.add(rawMaterial);
-            }
-        });
-
-        rmList.forEach(rawMaterial -> {
-            if (rawMaterial.getName().replace(".", "").replace(" ", "").replace("-", "").toUpperCase().trim().equals("RESIN")) {
-                list.add(rawMaterial);
-            }
-        });
-
-        int k = list.size();
-        if (k != DEFAULT_ROW_COUNT){
-            for (int i = 0; i < DEFAULT_ROW_COUNT - k; i++) {
-                list.add(new RawMaterial());
-            }
-        }
+                for(int var12 = 0; var12 < var11; ++var12) {
+                    Oxide oxide = var10[var12];
+                    rowObj[var++] = map.get(oxide) * proportion / 100.0D;
+                }
+                this.data.add(rowObj);
+            });
 
 
-        return list;
-    }
-
-    private void initDefaultData(ArrayList<RawMaterial> rmList){
-        Double sumProportion = new Double(0.0D);
-        Double sumVolume = new Double(0.0D);
-        for(int i = 0; i < DEFAULT_ROW_COUNT; ++i) {
-            Object[] rowObj = new Object[this.getColumnCount()];
-            RawMaterial rm = rmList.get(i);
-            int j = 0;
-            Double proportion = new Double(9.0D);
-            Double mass = 1000.0D * proportion / 100.0D;
-            Double volume = mass / rm.getBD()/1000;
-            int var = j + 1;
-            rowObj[j] = rm;
-            rowObj[var++] = proportion;
-            rowObj[var++] = rm.getPriceBK5();
-            rowObj[var++] = rm.getPriceBK6();
-            rowObj[var++] = new Double(0.0D);
-            rowObj[var++] = volume;
-            rowObj[var++] = mass;
-            rowObj[var++] = rm.getBD();
-            Map<Oxide, Double> map = rm.getChemicalAnalysis();
-            Oxide[] var10 = Oxide.values();
-            int var11 = var10.length;
-
-            for(int var12 = 0; var12 < var11; ++var12) {
-                Oxide oxide = var10[var12];
-                rowObj[var++] = map.get(oxide) * proportion / 100.0D;
-            }
-            this.data.add(rowObj);
-
-            //суммарная строка
-            sumProportion += proportion;
-            sumVolume += volume;
-        }
-        //пустая строка
-        Object[] sumObj = new Object[this.getColumnCount()];
-        sumObj[1] = sumProportion;
-        sumObj[5] = sumVolume;
-        data.add(sumObj);
-        
-        //Отрисовка доли объема
-        for (int i = 0; i < DEFAULT_ROW_COUNT; i++) {
-            setValueAt((Double)data.get(i)[5] * 100/sumVolume, i , 4);
-        }
+        //пустая строка для подсчетов
+        this.data.add(new Object[this.getColumnCount()]);
     }
 
 

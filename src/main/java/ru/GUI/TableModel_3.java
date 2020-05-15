@@ -17,6 +17,7 @@ public class TableModel_3 extends AbstractTableModel {
 
         private String[] columnNames = {
                 "Наименование",
+                "BD, г/см\u00B3",
                 "MgO",
                 "Al\u2082O\u2083",
                 "SiO\u2082",

@@ -4,10 +4,12 @@ import ru.GUI.MainFrame;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class MixtureGenerator {
     //База по сырьевым материалам
-    public static ArrayList<RawMaterial> rawList = new ArrayList();
+    public static HashMap<String, RawMaterial> rawList = new LinkedHashMap<>();
     private static final String sourceBookPath = "C:\\GIT\\JavaRush\\MixtureGenerator\\src\\main\\resources\\RM.xls";
     private static final String destBookPath = "C:\\GIT\\JavaRush\\MixtureGenerator\\src\\main\\resources\\destRM.xls";
 
