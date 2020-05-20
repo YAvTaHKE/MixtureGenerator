@@ -6,7 +6,7 @@ import java.awt.*;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class CustomCellRenderer extends DefaultTableCellRenderer {
+public class CustomCellRendererTable_1 extends DefaultTableCellRenderer {
 
     private static final long serialVersionUID = 1L;
     int precision = 0;
@@ -18,6 +18,10 @@ public class CustomCellRenderer extends DefaultTableCellRenderer {
         //установка отображения основной части таблицы
         super.setHorizontalAlignment(SwingConstants.CENTER);
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        if (value != null){
+            super.setToolTipText(value.toString());
+        }
+
         //super.setOpaque(true);
         //super.setBackground(Color.ORANGE);
 
@@ -27,10 +31,12 @@ public class CustomCellRenderer extends DefaultTableCellRenderer {
                 if (obj.toString().equals("-")) {
                     JLabel c = new JLabel("-");
                     c.setHorizontalAlignment(SwingConstants.CENTER);
+                    c.setToolTipText(value.toString());
                     return c;
                 }
             }
             JLabel c = new JLabel(String.format(Locale.GERMANY, "%.2f", value));
+            c.setToolTipText(value.toString());
             if(row == 11){
                 c.setOpaque(true);
                 //c.setFont(new Font(c.getFont().getName(),Font.BOLD, 12));
@@ -48,12 +54,14 @@ public class CustomCellRenderer extends DefaultTableCellRenderer {
             if (obj.toString().equals("-")) {
                 JLabel c = new JLabel("-");
                 c.setHorizontalAlignment(SwingConstants.CENTER);
+                c.setToolTipText(value.toString());
                 return c;
             }
         }
         if (column == 1 && row != 11) {
             JLabel c = new JLabel(String.format(Locale.GERMANY, "%.1f %%", value));
             c.setHorizontalAlignment(SwingConstants.CENTER);
+            c.setToolTipText(value.toString());
             return c;
         }
 
@@ -61,6 +69,9 @@ public class CustomCellRenderer extends DefaultTableCellRenderer {
         //Установка отображения строки суммирования результатов
         if (row == 11) {
             JLabel c = new JLabel(value != null ? String.format("%.1f", value) : "");
+            if (value != null){
+                super.setToolTipText(value.toString());
+            }
             c.setOpaque(true);
             //c.setBackground(Color.YELLOW);
             c.setHorizontalAlignment(SwingConstants.CENTER);
@@ -84,7 +95,7 @@ public class CustomCellRenderer extends DefaultTableCellRenderer {
         return this;
     }
 
-    public CustomCellRenderer(int p_precision) {
+    public CustomCellRendererTable_1(int p_precision) {
         super();
         setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         precision = p_precision;

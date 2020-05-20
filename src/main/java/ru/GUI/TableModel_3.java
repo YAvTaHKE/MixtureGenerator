@@ -17,6 +17,7 @@ public class TableModel_3 extends AbstractTableModel {
 
         private String[] columnNames = {
                 "Наименование",
+                "Пористость",
                 "BD, г/см\u00B3",
                 "MgO",
                 "Al\u2082O\u2083",
@@ -25,7 +26,7 @@ public class TableModel_3 extends AbstractTableModel {
                 "Fe\u2082O\u2083",
                 "TiO\u2082",
                 "C",
-                "LOI"};
+                "Всего"};
 
         private ArrayList<Object[]> data;
 
@@ -53,6 +54,9 @@ public class TableModel_3 extends AbstractTableModel {
             }
             data.get(0)[0] = new String("На сухое вещество");
             data.get(1)[0] = new String("На прокаленное вещество");
+            data.get(0)[1] = new Double(2);
+            data.get(1)[1] = new Double(8);
+
         }
 
 
@@ -82,6 +86,8 @@ public class TableModel_3 extends AbstractTableModel {
 
         @Override
         public boolean isCellEditable(int row, int col) {
+
+            if (col == 1) return true;
             return false;
         }
 

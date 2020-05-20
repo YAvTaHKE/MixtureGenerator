@@ -34,14 +34,15 @@ public class TableModel_1 extends AbstractTableModel {
             "Fe\u2082O\u2083",
             "TiO\u2082",
             "C",
-            "LOI"};
+            "LOI",
+    };
 
     private ArrayList<Object[]> data;
 
-    public TableModel_1(HashMap<String, RawMaterial> rmList) {
+    public TableModel_1(LinkedHashMap<RawMaterial, Double> rmMap) {
         columnNames = htmlFormatter(columnNames);
         this.data = new ArrayList<>();
-        initDefaultData(DefaultMixtures.MC(rmList));
+        initDefaultData(rmMap);
     }
     private String[] htmlFormatter(String[] strings){
         String[] str = new String[strings.length];
@@ -54,7 +55,6 @@ public class TableModel_1 extends AbstractTableModel {
         }
         return str;
     }
-
 
     private void initDefaultData(LinkedHashMap<RawMaterial, Double> rmMap){
 
@@ -86,12 +86,9 @@ public class TableModel_1 extends AbstractTableModel {
                 }
                 this.data.add(rowObj);
             });
-
-
         //пустая строка для подсчетов
         this.data.add(new Object[this.getColumnCount()]);
     }
-
 
     @Override
     public int getColumnCount() {
