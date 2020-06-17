@@ -9,8 +9,8 @@ import java.util.Map;
 public class RawMaterial {
 
     private String name; //краткая абривиатура сырьевого материала
-    private int priceBK5; //цена за тонну в юанях
-    private int priceBK6; //цена BK6
+    private double priceBK5; //цена за тонну в юанях
+    private double priceBK6; //цена BK6
     private double bd; //истинная плотность
 
 
@@ -28,29 +28,32 @@ public class RawMaterial {
         this.name = name;
     }
 
-    public void setPriceBK5(int price) {
+    public void setPriceBK5(double price) {
         this.priceBK5 = price;
     }
-    public void setPriceBK6(int price) {
+    public void setPriceBK6(double price) {
         this.priceBK6 = price;
     }
 
     public RawMaterial() {
-        this.name = "default";
-        this.priceBK5 =0;
-        this.priceBK6 =0;
+        this.name = "-";
+        this.priceBK5 =0.0D;
+        this.priceBK6 =0.0D;
         this.chemicalAnalysis = new HashMap<>();
-        this.bd = 0;
+        for (Oxide oxide : Oxide.values()) {
+            chemicalAnalysis.put(oxide, 0.0D);
+        }
+        this.bd = 0.0D;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getPriceBK5() {
+    public double getPriceBK5() {
         return priceBK5;
     }
-    public int getPriceBK6() {
+    public double getPriceBK6() {
         return priceBK6;
     }
 
@@ -75,4 +78,6 @@ public class RawMaterial {
     public String toString() {
         return name;
     }
+
+
 }
